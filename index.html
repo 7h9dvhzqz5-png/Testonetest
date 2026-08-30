@@ -1797,7 +1797,7 @@ function freshState(){return{
  pick:1,           // next overall pick
  live:false,
  done:false,
- seat:4,           // drawn: 4th of 8           // my draft slot (1-8)
+ seat:4,           // my draft slot (1-12)
  queue:[],
  // DRAFT ORDER DRAWN: Jordan, Stephen, Sean, Liam, Paul, Ryan, Mark, Michael — the Papal are seat 4.
  names:["R. Jackman", "J. Bainbridge", "P. Shepherd", "L. Murray", "Z. Hall", "A. Owen", "C. Batty", "s. clarke", "D. Muncaster", "M. Haigh", "M. Milton", "S. Clarke"],   // draft order as drawn; I am seat 4 (L. Murray)
@@ -2773,7 +2773,7 @@ function reasonFor(p){
  else if(p.ovr<=6)head="An elite, every-week anchor — exactly who you build around";
  else if(p.ovr<=15&&vonaOf(p)>=8)head="Top-tier talent AND scarce by your next pick — take him now";
  else if(p.ovr<=18)head="A high-end starter who anchors your build";
- else if(p.pos==="QB"&&p.posRank<=6&&c.QB===0)head="The QB edge is live: a top arm here is a real weekly advantage in our 8-team pool";
+ else if(p.pos==="QB"&&p.posRank<=6&&c.QB===0)head="The QB edge is live: a top arm here is a real weekly advantage";
  else if(p.pos==="TE"&&p.posRank<=5&&c.TE===0)head="A difference-making TE the market is fading — cheap edge at a scarce spot";
  else if(p.ecr>=10)head="Strong value — experts rank him well above where he's being drafted";
  else if(p.pos==="RB"&&p.posRank<=8&&c.RB<2)head="Secures scarce RB volume before the steep drop-off";
@@ -3243,7 +3243,7 @@ function renderBoard(){
      const rbNote=b.rbWindowPick?`Your <b>elite-RB window closes at pick #${b.rbWindowPick}</b> — after that the top RB tier is gone, so if you want a stud back it happens at or before #${b.rbWindowPick}.`:`Elite RBs will mostly be gone before your first pick — plan to build around WR/TE early and take RB value as it falls.`;
      setupHtml+=`<div class="setup brief"><div class="su-h">Your seat — the opening read</div>
        <div class="brief-picks">Picks 1–4: ${pickLine}</div>
-       <div class="brief-body">In an 8-team draft the board barely moves early, so your first two picks are close to <b>locked</b> by your seat; rounds 3–4 open up. ${rbNote}</div>
+       <div class="brief-body">With 12 teams you wait <b>17 picks</b> between your first and second turn, so survival matters far more than in a shallow league. Running back is the premium position here — 31 start league-wide, against 21 in an 8-team. ${rbNote}</div>
        <div class="brief-foot">Rounds 1–2 you can plan; rounds 3–4 stay flexible and take the best value.</div></div>`;
    }catch(e){}
  }
@@ -3501,7 +3501,7 @@ function renderReport(){
  }
  // positional bars vs league avg
  const posAvg={};["QB","RB","WR","TE"].forEach(pos=>{
-   let tot=0;for(let t=0;t<8;t++){const r=PLAYERS.filter(p=>(t===seatIdx()?S.status[p.id]==="mine":S.teamOf[p.id]===t)&&p.pos===pos);tot+=r.sort((a,b)=>b.proj-a.proj).slice(0,pos==="RB"||pos==="WR"?2:1).reduce((a,b)=>a+b.proj,0);}
+   let tot=0;for(let t=0;t<TEAMS;t++){const r=PLAYERS.filter(p=>(t===seatIdx()?S.status[p.id]==="mine":S.teamOf[p.id]===t)&&p.pos===pos);tot+=r.sort((a,b)=>b.proj-a.proj).slice(0,pos==="RB"||pos==="WR"?2:1).reduce((a,b)=>a+b.proj,0);}
    posAvg[pos]=tot/8;
  });
  let bars="";
@@ -3548,8 +3548,8 @@ function renderStrategy(){
  const el=document.getElementById("pg-strategy");
  el.innerHTML=`<div class="doc">
   <h2>The Papal Playbook</h2>
-  <p>This tool runs a <b>value-over-replacement engine</b> tuned specifically for our <b>8-team Full PPR</b> league, using the current FantasyPros consensus board (478 players, real projections, tiers, schedule and market signal).</p>
-  <h3>Why 8-team changes everything</h3>
+  <p>This tool runs a <b>value-over-replacement engine</b> tuned specifically for this <b>12-team Full PPR</b> league, using the current FantasyPros consensus board (478 players, real projections, tiers, schedule and market signal).</p>
+  <h3>Why 12-team changes everything</h3>
   <ul>
    <li><b>Ceiling beats floor.</b> Only 80 players start weekly — the wire stays stocked with startable talent, so a "safe" bench player is wasted. From the mid-rounds on, the engine hunts <b>upside darts</b>, not floors.</li>
    <li><b>No backup QB/TE/K/DST.</b> You stream those. Every bench slot is a lottery ticket.</li>
@@ -3563,7 +3563,7 @@ function renderStrategy(){
   <p>When a position run starts, the tool tells you whether it's a real <b>tier-drop</b> (act) or a <b>panic</b> run (take the value everyone's ignoring). That discrimination is the sharpest live-draft edge against experienced opponents.</p>
   <h3>Fixtures & byes</h3>
   <p>Byes are judged <b>relative to the opponent you face that week</b> — two of your starters out against a full-strength rival is a hole; against a rival who's also short, it's a wash. Set your rotation in Settings to activate it, plus a Week 15–17 playoff-readiness check.</p>
-  <p class="fine">Data: FantasyPros consensus — ADP refreshed 5 Aug 2026, projections and tiers from the July merge, injuries to 10 Aug. Refresh 3–5 days pre-draft for final numbers. Engine calibrated for Full PPR · QB/2RB/2WR/TE/FLEX(W-R)/K/DST + 7 bench · 8 teams · ${ROUNDS} rounds (${TOTAL} picks). Built for the Papal. Up the Bears.</p>
+  <p class="fine">Data: FantasyPros consensus — ADP refreshed 5 Aug 2026, projections and tiers from the July merge, injuries to 10 Aug. Refresh 3–5 days pre-draft for final numbers. Engine calibrated for Full PPR · QB/2RB/2WR/TE/FLEX(W-R)/K/DST + 7 bench · ${TEAMS} teams · ${ROUNDS} rounds (${TOTAL} picks). Built for L. Murray.</p>
   <p class="fine">Toolkit: opponent-aware VONA · Monte Carlo survival odds · 3-pick sequence planner · run detector (panic vs tier-drop) · elite-faller protection · fixture-aware bye penalties · stacks & dilution flags · Bears tiebreaker · practice mode with bots modelled on 6 years of your league (Sean strikes QB early, Stephen waits, Ryan loves a TE, Michael drafts sharp). Reset any manager to a generic bot in Settings. Tip: on iPhone, Share → <b>Add to Home Screen</b> to run it full-screen like a native app.</p>
  </div>`;
 }
@@ -3629,7 +3629,7 @@ function renderSettings(){
    <div class="sub">Your draft slot</div>
    <div class="setrow">
      <label class="setf">Draft position<select onchange="S.seat=+this.value;save();render()">${seatOpts}</select></label>
-     <label class="setf">League size<span class="lock">8 teams <em>LOCKED</em></span></label>
+     <label class="setf">League size<span class="lock">${TEAMS} teams · ${ROUNDS} rounds <em>LOCKED</em></span></label>
    </div>
    <div class="sub">Practice difficulty</div>
    <div class="diffrow">${["casual","realistic","sharks"].map(d=>`<button class="diffbtn ${(S.difficulty||"realistic")===d?"on":""}" onclick="S.difficulty='${d}';save();render()">${d==="casual"?"Casual":d==="sharks"?"Sharks":"Realistic"}</button>`).join("")}</div>
