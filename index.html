@@ -571,7 +571,11 @@ const COLS=["ovr", "adp", "name", "team", "pos", "posRank", "tier", "bye", "sos"
 // an 8-team league with 1QB/2RB/2WR/1TE and a W-R flex. RECOMPUTED from the true league-scoring
 // projections — the old values were calibrated to the July half-PPR scale, which left almost
 // every QB with negative value once the real numbers landed.
-const REPL={"QB": 19.0, "RB": 11.8, "WR": 10.6, "TE": 9.0, "K": 10.0, "DST": 2.6};   // matched to the July projection scale in use
+const REPL={"QB": 15.8, "RB": 9.7, "WR": 11.7, "TE": 9.5, "K": 9.6, "DST": 2.2};
+// TWELVE-TEAM replacement levels. Recomputed for this league: with 12 teams the replacement
+// player at every position is materially worse, which lifts everyone's value against it. The
+// biggest shift is RUNNING BACK - replacement falls from 11.8 to 9.7 because 31 backs start
+// league-wide instead of 21, so elite backs are far scarcer here than in the 8-team league.   // matched to the July projection scale in use
 const SCORING="Full PPR";
 const RAWP=[
 [1,1,"J. Gibbs","DET","RB",1,1,6,5,0,1.7,17.1,-1.5,0,"alpha",0,1,"Last year, Jahmyr Gibbs finished as the RB3 in fantasy points per game. After Week 10, his usage got a massive bump as he didn’t play less than 68% of the snaps in any game for the rest of the season while averaging 20 touches and 114.9 total yards pre game. This stretch of games from Weeks 11-18 also coincided with Sam LaPorta’s absence, which increased Gibbs’ passing game usage. In Weeks 1-10, Gibbs had a 12.7% target share, 25.2 receiving yards per game, and an 11.1% first-read share (per Fantasy Points Data). In Weeks 11-18, Gibbs saw a huge increase in work through the air without LaPorta, with a 19% target share, 48.6 receiving yards per game, and a 19.6% first-read share. Gibbs led all running backs in those statistical categories in the final eight games of the season. Gibbs is in the running for RB1 overall for 2026, but if the rest of the weapons for Detroit remain healthy all season, it could be tough for him to do so. I still expect him to be a top-three back this season who is insanely efficient with his passing game and early down work. Last year, he ranked ninth in explosive run rate and third in missed tackles forced per attempt. Gibbs will and should be a top 3-5 pick in every fantasy draft this year."],
@@ -1063,8 +1067,8 @@ const RAWP=[
 
 
 /*═══════════════ STATE ═══════════════*/
-const KEY="papal_draft_2026";
-const TEAMS=8, ROUNDS=15, TOTAL=TEAMS*ROUNDS;   // 9 starters + 6 bench = 15 picks
+const KEY="papal_draft_2026_12team";
+const TEAMS=12, ROUNDS=16, TOTAL=TEAMS*ROUNDS;   // 12 teams, 9 starters + 7 bench = 16 rounds, 192 picks
 const POSCOLORS={QB:"var(--qb)",RB:"var(--rb)",WR:"var(--wr)",TE:"var(--te)",K:"var(--k)",DST:"var(--dst)"};
 const REQ={QB:1,RB:2,WR:2,TE:1,FLEX:1,K:1,DST:1};
 const FLEXPOS=["RB","WR"];
@@ -1080,15 +1084,14 @@ const QB_FALLBACK=21;  // Josh Allen (BUF) — only if Caleb is gone
 const QB_TARGETS=[QB_PRIMARY,QB_FALLBACK];
 // The eight real teams in the league. Order here is only a starting guess — reassign each seat
 // in Settings once the draft order is drawn.
-const LEAGUE_TEAMS=["San Diego Lhoyal","Bring Back Autodraft","Staunch Hand Eggers","We are the Papal",
-                    "Maye-O For Sam","Ladies & Jeantymen","Two Gurleys One Kupp","The Hail hailmarys"];
+const LEAGUE_TEAMS=["R. Jackman", "J. Bainbridge", "P. Shepherd", "L. Murray", "Z. Hall", "A. Owen", "C. Batty", "s. clarke", "D. Muncaster", "M. Haigh", "M. Milton", "S. Clarke"];
 // Who runs which team. Choosing a team in Settings now sets that seat's drafting model too,
 // so the likely-picks and survival odds use the right manager's tendencies.
 const TEAM_MGR={"San Diego Lhoyal":"Jordan","Bring Back Autodraft":"Stephen","Staunch Hand Eggers":"Sean",
   "We are the Papal":"Liam","Maye-O For Sam":"Paul","Ladies & Jeantymen":"Ryan",
   "Two Gurleys One Kupp":"Mark","The Hail hailmarys":"Michael"};   // league flex is (W/R) — tight ends are NOT flex-eligible
 const SLOTS=[["QB","QB"],["RB","RB"],["RB","RB"],["WR","WR"],["WR","WR"],["TE","TE"],["FLEX","FLEX"],["K","K"],["DST","DST"],
- ["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"]
+ ["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"],["BN","BN"]
 ];
 
 // build PLAYERS from RAWP columns
@@ -1687,6 +1690,40 @@ const TREND9={3:[0,1.2],4:[-1.4,0],12:[-1.2,0],13:[0,1.4],15:[0,-5.9],25:[0,1.5]
  });
 })();
 
+(function sweep0831(){
+ /* Sweep 31 Aug 2026 - Yahoo camp tracker, RotoWire, Sharp IR tracker, NFL transactions.
+    Waiver claims from Sunday's cuts settle TODAY at 1pm ET; practice squads form after. */
+ {const p=PLAYERS.find(x=>x.fullName==="J. Tyson"&&x.pos==="WR");
+  if(p){p.injury="OUT";p.adp=999;p.adpEff=999;p.proj=0;p.spike=false;p.unsettled=false;p.split=false;
+   p.note="\u26a0 OUT ~TWO MONTHS \u2014 hamstring, reported by Garafolo and Rapoport. A DIFFERENT hamstring from the earlier one, and he may open the season on IR. He was the biggest riser in the market over the past week, so his price has not caught up. Do not draft him in a 16-round league; revisit as a late stash only if his ADP collapses.";}}
+ {const p=PLAYERS.find(x=>x.fullName==="J. Noel"&&x.pos==="WR");
+  if(p)p.note="\u2713 Higgins' season-ending ACL clears a path for Noel, Hutchinson and Tank Dell in Houston. Noel is the youngest of the three and the likeliest to grow into the role. "+(p.note||"");}
+ {const p=PLAYERS.find(x=>x.fullName==="D. Schultz"&&x.pos==="TE");
+  if(p)p.note="\u2713 Slight bump: Houston lost Jayden Higgins for the season, and target share has to go somewhere. "+(p.note||"");}
+})();
+
+/*=== LIVE 12-TEAM PPR ADP - real-time-adp/ppr (default league size = 12), 31 Aug 2026 ===
+   Confirmed 12-team: rank 12 is slot 1.12 and rank 13 is 2.01. This is the market this league
+   drafts in, replacing the 8-team prices the board was carrying. ===*/
+const RT12={0:1.3,1:2.3,2:3.7,3:6.2,4:10.4,5:6.8,6:7.6,7:6.5,8:10.6,9:9.8,10:12.4,11:22.0,12:19.4,13:17.9,14:23.0,15:19.7,16:19.4,17:11.9,18:24.7,19:14.2,20:26.2,21:23.8,22:17.1,23:29.5,24:16.6,25:14.8,26:33.3,27:36.1,28:54.5,29:41.4,30:40.8,31:26.1,32:42.9,33:27.3,34:37.5,35:31.3,36:33.8,37:41.5,38:30.4,39:43.5,40:56.6,41:34.6,42:53.9,43:60.5,44:52.6,45:37.7,46:42.2,47:64.7,48:42.5,49:39.8,50:55.6,51:66.8,52:48.3,53:67.9,54:43.4,55:66.7,56:54.8,57:61.9,58:45.4,59:63.8,60:63.8,61:51.3,62:52.2,63:58.8,64:50.7,65:59.2,66:76.3,67:83.3,68:95.5,69:73.2,70:73.3,71:97.2,72:72.1,73:79.4,74:82.7,75:79.6,76:90.5,77:85.0,78:87.6,79:66.9,80:76.3,81:83.3,82:73.4,83:106.6,84:98.4,85:75.2,86:109.7,88:90.1,89:105.2,90:66.6,91:118.3,92:91.2,93:88.0,94:88.4,95:104.1,96:98.4,97:104.1,98:120.3,99:113.8,100:111.5,101:85.0,102:126.7,104:104.3,105:121.2,106:131.8,107:99.9,108:107.4,109:122.2,110:142.6,111:103.3,112:103.8,113:106.0,114:115.3,115:111.6,116:132.9,117:126.3,118:148.1,119:115.7,120:150.4,122:118.4,123:131.8,124:158.6,125:103.6,126:157.9,127:137.1,128:143.0,129:130.7,130:137.7,131:158.9,132:88.5,133:139.6,134:114.7,135:133.5,136:166.2,137:160.5,138:121.4,139:159.9,140:148.0,141:157.2,142:143.4,143:148.4,144:155.9,145:149.8,146:170.5,147:157.3,148:159.5,149:149.4,150:147.3,151:151.9,152:149.9,153:167.2,154:112.0,155:162.9,156:163.8,157:169.9,158:166.1,159:166.4,160:153.4,161:163.9,162:124.5,163:161.1,164:165.5,165:161.6,166:165.9,167:184.2,168:123.1,169:112.7,170:137.1,171:156.3,172:98.8,173:162.0,174:133.0,175:170.1,176:171.8,177:166.4,178:155.0,179:160.8,180:171.3,181:170.5,182:156.8,183:165.0,184:153.4,185:146.5,186:182.2,187:110.6,188:134.6,189:161.4,190:138.4,191:170.0,192:170.2,193:150.8,194:165.6,195:142.4,196:169.3,197:133.9,198:168.2,199:163.0,200:184.7,201:171.5,202:164.1,203:156.7,204:166.1,205:170.3,206:172.3,207:163.7,208:173.2,209:159.4,210:185.7,211:168.7,212:168.9,213:169.9,214:168.3,215:178.2,216:167.3,217:172.2,218:169.6,219:170.0,220:171.7,221:110.2,222:161.4,223:168.6,224:166.4,225:156.5,226:181.7,227:169.0,228:172.3,229:189.7,230:171.1,231:171.1,232:165.7,233:171.0,234:159.7,235:133.0,236:171.3,237:169.2,238:156.3,239:170.2,240:169.6,241:171.2,242:164.1,243:169.7,244:166.0,245:171.2,246:168.9,247:172.1,248:167.6,249:183.2,250:218.7,251:170.7,252:169.7,253:202.2,254:194.7,255:168.7,256:172.7,257:188.2,258:224.7,259:172.7,260:182.7,261:181.2,262:211.2,264:193.2,265:169.2,266:172.7,267:212.7,268:171.5,269:169.8,270:169.7,271:180.2,272:235.7,273:167.8,274:197.2,275:222.2,276:185.2,277:209.2,278:171.0,279:227.7,281:170.6,282:168.4,283:165.4,284:224.2,285:207.7,286:223.2,287:199.2,288:156.6,289:194.2,290:219.2,291:163.5,292:169.7,293:171.0,294:168.3,295:200.7,296:206.2,297:193.7,298:179.7,299:206.7,300:186.7,301:259.7,302:220.2,303:259.2,304:190.7,305:210.7,306:247.2,307:187.7,308:205.7,309:178.7,310:236.7,311:150.6,312:245.7,313:180.7,314:234.7,315:195.7,316:169.7,317:250.7,318:215.7,319:244.7,320:209.7,321:208.2,322:247.7,323:235.2,324:238.7,325:236.2,326:249.7,327:201.7,328:228.2,329:241.2,330:255.2,331:229.7,332:192.2,333:166.9,334:225.7,335:226.2,336:226.7,337:244.2,338:218.2,339:233.2,340:203.2,341:231.7,342:204.2,343:240.2,344:6.8,345:255.7,346:204.7,347:220.7,348:210.2,349:168.7,350:216.7,351:228.7,352:246.2,353:208.7,354:234.2,355:216.2,356:221.7,357:251.7,358:254.7,359:191.7,360:239.2,361:253.7,362:243.7,363:203.7,364:179.2,365:171.2,366:171.7,367:192.7,368:221.2,369:238.2,370:213.7,371:254.2,372:202.7,373:214.2,374:232.2,375:219.7,376:150.6,377:233.7,378:198.2,379:205.2,380:256.2,381:183.7,382:168.7,383:172.6,384:170.1,385:195.2,386:215.2,387:256.7,388:260.2,389:188.7,390:253.2,391:230.2,392:189.2,393:267.2,394:258.7,395:264.2,396:225.2,397:268.2,398:260.7,399:268.7,400:277.7,401:196.2,402:245.2,403:262.7,404:263.2,405:281.2,406:263.7,407:243.2,408:269.2,409:262.2,410:252.2,411:212.2,412:264.7,413:265.2,414:265.7,415:197.7,416:266.2,417:266.7,418:249.2,419:267.7,420:280.7,421:217.7,422:172.6,423:257.2,424:241.7,425:163.5,426:250.2,427:232.7,428:269.7,429:246.7,430:187.2,431:230.7,432:273.2,433:270.2,434:270.7,435:237.7,436:248.2,437:214.7,438:271.2,439:271.7,440:242.2,441:272.2,442:248.7,443:272.7,444:237.2,445:261.2,446:276.7,447:229.2,448:273.7,449:258.2,450:274.2,451:239.7,452:242.7,453:201.2,454:261.7,455:275.2,456:275.7,457:211.7,458:276.2,459:277.2,460:251.2,461:223.7,462:278.2,463:274.7,464:278.7,465:231.2,466:279.2,467:240.7,468:198.7,469:279.7,470:196.7,471:280.2,472:252.7,473:207.2,474:199.7,475:257.7,476:217.2,477:222.7,478:190.2,479:186.2,480:191.2,481:200.2,482:213.2,483:227.2};
+const TR12={3:[-1.3,-1.5],4:[-3.2,-3.9],13:[0,1.4],15:[0,-5.5],20:[0,-2.1],21:[3.5,1.7],24:[2.0,0],25:[0,1.8],26:[-1.1,-3.9],27:[0,1.1],28:[0,-3.1],29:[0,-3.6],30:[-1.2,-2.0],31:[1.3,1.4],32:[0,-7.1],35:[0,1.3],36:[1.3,0],38:[1.1,0],39:[-1.3,0],40:[4.2,2.0],41:[0,2.0],42:[0,-1.7],43:[0,1.3],44:[1.3,0],45:[0,1.9],48:[0,1.8],49:[1.2,1.6],50:[1.6,1.3],51:[4.4,0],52:[0,1.2],53:[1.8,-1.9],54:[0,1.9],55:[-2.8,-2.9],56:[-1.1,0],57:[-1.6,1.4],58:[1.4,3.8],59:[-1.7,1.6],60:[2.3,-3.1],61:[-1.5,0],62:[0,1.1],64:[1.9,0],65:[0,4.3],66:[0,-3.5],67:[-1.2,1.8],68:[4.4,9.9],69:[-1.1,-2.8],70:[0,2.1],71:[4.5,2.3],72:[-1.2,0],74:[0,1.8],75:[0,-4.2],76:[1.2,0],78:[1.3,-1.8],79:[0,-2.1],80:[0,2.4],81:[2.8,2.5],82:[2.2,3.1],83:[0,-2.8],84:[1.8,0],86:[2.2,-3.3],88:[1.1,0],89:[0,-1.3],90:[0,3.4],91:[3.0,-1.2],92:[-1.7,0],93:[0,1.7],96:[-1.8,0],97:[4.2,3.3],98:[2.9,-1.6],99:[3.6,1.2],100:[0,-3.0],101:[0,8.1],102:[2.6,-5.5],105:[0,-1.7],106:[1.4,2.6],107:[1.2,-1.7],108:[0,-2.0],109:[2.1,-3.7],110:[0,1.1],111:[-1.9,0],113:[1.2,0],114:[-3.2,0],116:[1.4,0],117:[1.8,0],118:[4.0,0],119:[0,-4.0],120:[0,-1.9],123:[0,1.1],124:[2.0,0],125:[1.4,-4.1],126:[-1.4,-8.4],127:[0,4.9],128:[0,-1.2],129:[1.9,-2.3],131:[3.2,2.5],132:[-2.7,-2.6],133:[1.3,-5.2],134:[0,1.1],135:[3.2,-1.5],136:[0,1.7],137:[0,2.4],138:[0,-2.8],139:[0,1.5],140:[0,-1.3],141:[-2.0,-6.2],142:[-1.4,-4.0],143:[4.1,0],144:[-1.9,-1.8],145:[4.3,5.5],146:[1.2,-1.4],147:[-3.7,-5.4],148:[2.5,3.0],149:[1.2,-5.4],150:[2.5,-2.3],151:[2.1,0],152:[0,3.6],154:[5.8,11.3],155:[3.0,4.9],156:[1.1,4.7],157:[-2.9,2.5],158:[2.5,-1.5],160:[-2.0,-5.5],162:[0,9.0],163:[0,-3.0],164:[0,1.8],166:[0,7.6],168:[0,8.5],169:[-3.4,4.9],170:[-1.8,8.5],171:[2.9,4.9],172:[0,1.3],174:[-2.8,25.8],175:[1.6,0],177:[-1.2,1.2],178:[1.6,2.7],179:[0,2.9],180:[-1.6,-2.6],181:[0,3.2],182:[3.9,5.7],183:[-3.7,0],184:[-3.0,3.3],185:[0,6.1],187:[-3.5,4.9],188:[0,1.1],189:[-2.3,3.8],190:[-3.3,0],191:[1.2,-1.8],192:[3.6,-3.3],193:[-7.1,-2.0],194:[2.2,4.4],195:[-5.1,-4.9],196:[-1.2,3.8],197:[0,-4.8],198:[1.6,0],199:[2.4,5.7],202:[-4.3,-5.3],203:[-4.2,2.8],204:[-5.3,3.6],205:[0,4.2],206:[-2.2,-5.1],207:[-3.3,0],208:[-3.7,0],209:[0,1.6],211:[4.2,7.3],212:[2.5,2.6],213:[3.2,4.5],214:[-1.6,0],216:[-1.4,2.3],217:[-5.9,-5.7],218:[2.0,5.3],219:[-2.2,2.8],220:[-1.6,3.5],221:[-1.6,5.5],222:[-1.9,1.5],223:[0,2.8],224:[5.2,4.6],225:[1.7,10.1],227:[1.6,3.5],228:[-2.3,0],230:[-3.1,3.8],231:[-3.4,3.1],232:[0,-6.6],233:[-1.2,0],234:[0,3.8],235:[4.6,25.5],237:[1.5,3.0],238:[0,-1.4],239:[4.3,0],240:[-1.8,-1.3],241:[1.3,4.8],242:[-2.3,2.7],243:[0,3.3],244:[-1.8,4.1],245:[-1.7,8.2],246:[0,2.2],247:[-4.5,0],248:[3.7,0],251:[0,1.8],252:[2.9,1.8],255:[-2.7,1.6],256:[-1.9,0],259:[-4.5,2.4],265:[1.6,8.6],268:[-1.8,2.6],269:[5.0,0],270:[4.7,0],273:[2.8,6.3],278:[-3.5,4.1],281:[0,4.2],282:[0,2.2],283:[0,3.0],288:[1.2,2.1],291:[0,6.9],292:[0,-1.5],293:[-2.7,4.2],294:[2.2,0],311:[0,5.4],316:[-1.6,6.4],333:[0,3.2],349:[1.6,1.6],366:[-1.3,6.1],376:[0,5.4],382:[-1.4,2.3],384:[0,2.7],422:[-2.0,5.4],425:[-4.6,0]};
+(function merge12(){
+ PLAYERS.forEach(p=>{
+   const v=RT12[p.id]; if(v!=null)p.adp=v;
+   const t=TR12[p.id]; if(t){p.t24=t[0];p.t7=t[1];}
+ });
+ PLAYERS.forEach(p=>{
+   const mo=(typeof p.t7==="number"&&p.t7!==0)?p.t7:((typeof p.t24==="number")?p.t24*2:0);
+   p.adpEff=+(p.adp+Math.max(-5,Math.min(5,mo*0.3))).toFixed(1);
+ });
+ const byKey={};
+ PLAYERS.forEach(p=>{const k=p.fullName+"|"+p.pos;(byKey[k]=byKey[k]||[]).push(p);});
+ Object.values(byKey).forEach(g=>{
+   if(g.length<2)return; g.sort((a,b)=>b.proj-a.proj);
+   for(let i=1;i<g.length;i++) if(g[i].proj<g[0].proj*0.5){g[i].adp=Math.max(g[i].adp,260+i);g[i].adpEff=g[i].adp;}
+ });
+})();
+
 (function sweep0830b(){
  {const p=PLAYERS.find(x=>x.fullName==="G. Kittle"&&x.pos==="TE");
   if(p){p.injury=null;
@@ -1763,11 +1800,9 @@ function freshState(){return{
  seat:4,           // drawn: 4th of 8           // my draft slot (1-8)
  queue:[],
  // DRAFT ORDER DRAWN: Jordan, Stephen, Sean, Liam, Paul, Ryan, Mark, Michael — the Papal are seat 4.
- names:["San Diego Lhoyal","Bring Back Autodraft","Staunch Hand Eggers","We are the Papal","Maye-O For Sam","Ladies & Jeantymen","Two Gurleys One Kupp","The Hail hailmarys"],
- mgrs:["Jordan","Stephen","Sean",null,"Paul","Ryan","Mark","Michael"],
- // 2026 schedule — my opponent each week (weeks 1-7 repeat as 8-14; playoffs start week 15).
- // 6 Two Gurleys, 2 Staunch, 0 Lhoyal, 5 Jeantymen, 4 Maye-O, 1 Autodraft, 7 Hailmarys
- fixtures:[6,2,0,5,4,1,7,6,2,0,5,4,1,7],
+ names:["R. Jackman", "J. Bainbridge", "P. Shepherd", "L. Murray", "Z. Hall", "A. Owen", "C. Batty", "s. clarke", "D. Muncaster", "M. Haigh", "M. Milton", "S. Clarke"],   // draft order as drawn; I am seat 4 (L. Murray)
+ mgrs:Array(12).fill(null),   // no draft history for this league - all modelled league-average
+ fixtures:Array(14).fill(null),   // schedule unknown for this league
  difficulty:"realistic",
  waiverMode:false, waiverFilter:"ALL", meterCollapsed:false, focus:true, moreTabs:false, alertsOpen:false,
  practice:false, showAll:false, tab:"board", view:"list", posFilter:"ALL", search:"", expanded:null, qlogQ:""
@@ -1781,7 +1816,7 @@ function loadState(){
  // League configuration version. When this file ships a new setup (team names, managers, seat,
  // schedule), a state saved under an older version must not keep overriding it — that is why the
  // fixtures looked empty after an update. Draft progress is untouched; only the setup refreshes.
- const CFG=4;
+ const CFG=102;
  if((s.cfg|0)<CFG){
    s.names=f.names; s.mgrs=f.mgrs; s.fixtures=f.fixtures; s.seat=f.seat; s.cfg=CFG;
  }
@@ -1817,7 +1852,7 @@ function loadState(){
  return o;
 }
 let saveTimer=null;
-function save(){try{localStorage.setItem(KEY,JSON.stringify({...S,sig:dataSig(),cfg:4}));flashSaved();}catch(e){/* in-memory fallback (artifact preview) */}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({...S,sig:dataSig(),cfg:102}));flashSaved();}catch(e){/* in-memory fallback (artifact preview) */}}
 function flashSaved(){const el=document.getElementById("saved");el.classList.add("show");clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove("show"),900);}
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1400);}
 
@@ -1826,7 +1861,7 @@ const seatIdx=()=>S.seat-1;
 function teamOnClock(pick){const rd=Math.floor((pick-1)/TEAMS),i=(pick-1)%TEAMS;return rd%2===0?i:TEAMS-1-i;}
 const clockTeam=()=>teamOnClock(S.pick);
 const myCount=()=>PLAYERS.filter(p=>S.status[p.id]==="mine").length;
-const rosterCap=()=>SLOTS.length; // 15 = 9 starters + 6 bench (the 3 IR slots are not drafted)
+const rosterCap=()=>SLOTS.length; // 16 = 9 starters + 7 bench (the IR slot is not drafted)
 
 // LAW: never exceed limits; idempotent; single choke point
 function mark(id,action){
@@ -2437,19 +2472,27 @@ function recommendations(){
    // spot when the waiver wire always holds a startable arm. Research consensus for shallow
    // leagues is unanimous on this; measured as finish-neutral here, but it frees a bench slot
    // for an upside RB/WR, which the starters-only finish metric cannot see.
-   if(p.pos==="QB"&&_c.QB>=1)a-=60;
+   // Twelve teams: 12 QBs start and 16 remain undrafted, so a backup is still a wasted bench
+   // spot - just less emphatically than at 8 teams. Penalty raised because a 192-pick draft
+   // thins the late pool enough that -60 was not always decisive.
+   // A player out for the season must never be recommended. Parking his ADP at 999 to bury him
+   // on the board had the opposite effect deep in a draft: the value component reads a huge
+   // gap between ADP and rank and scores him 130+. Hard-exclude instead.
+   if(p.injury==="OUT"||p.proj<=0)a-=500;
+   if(p.pos==="QB"&&_c.QB>=1)a-=120;
    // QB PREFERENCE — decides WHICH quarterback, never WHEN one is taken.
    // Researched Aug 2026: Caleb is the consensus QB7 and roughly 2 pts/game behind the best
    // value QB at the same ADP, so forcing his timing would cost the team. The winning-first
    // rule is therefore: let the engine choose the moment a QB is worth a pick, and when that
    // moment comes, take Caleb if he is still on the board (Allen only if Caleb has gone).
    // Opening pick: take the first-round target if he is there. No effect on any later pick.
-   if(_rd0===1&&myRoster().length===0&&p.id===R1_TARGET)a+=60;
+   // no first-round target in this league - the board plays out differently at 12 teams
    if(p.pos==="QB"&&_c.QB<1){
      const _cw=!!(BYID[QB_PRIMARY]&&!S.status[QB_PRIMARY]);
      const _al=!!(BYID[QB_FALLBACK]&&!S.status[QB_FALLBACK]);
-     const _want=_cw?QB_PRIMARY:(_al?QB_FALLBACK:null);
-     if(_want&&p.id!==_want)a-=40;   // demote rival QBs only — never promotes QB over a skill player
+     // no personal QB preference in this league - take the best value quarterback
+     const _want=null;
+     if(_want&&p.id!==_want)a-=40;
    }
    // KICKER / DEFENCE — drafted last, and chosen on SCHEDULE rather than season projection.
    // Liam's league docks a defence up to −7 for yards allowed, so a soft early slate is worth
@@ -2806,7 +2849,7 @@ function reasonFor(p){
 function reasonText(p){const r=reasonFor(p);return r.head+(r.bits.length?" · "+r.bits.join(" · "):"");}
 function byeTally(){const t={};myRoster().forEach(p=>{if((FLEXPOS.includes(p.pos)||p.pos==="QB")&&p.bye)t[p.bye]=(t[p.bye]||0)+1;});return t;}
 function oppByeCount(team,wk){return PLAYERS.filter(p=>S.teamOf[p.id]===team&&(FLEXPOS.includes(p.pos)||p.pos==="QB")&&p.bye===wk).length;}
-const nameOf=(i)=>i===seatIdx()?"We are the Papal":(S.names[i]||"Team "+(i+1));
+const nameOf=(i)=>i===seatIdx()?"L. Murray (you)":(S.names[i]||"Team "+(i+1));
 
 /*═══════════════ RUN PREDICTOR (J1 + M3) ═══════════════*/
 function runPredictor(){
@@ -2858,7 +2901,7 @@ function fixtureView(){
  const played=rows.filter(r=>r.opp!=null);
  const wins=played.filter(r=>r.edge>0).length;
  // playoff readiness wk16 (no byes)
- const po=Array.from({length:8},(_,t)=>weekPts(t,16)).sort((a,b)=>a-b);
+ const po=Array.from({length:TEAMS},(_,t)=>weekPts(t,16)).sort((a,b)=>a-b);
  const playoff={me:weekPts(seatIdx(),16),med:(po[3]+po[4])/2};
  return{rows,wins,losses:played.length-wins,played:played.length,
   avgEdge:played.length?played.reduce((a,r)=>a+r.edge,0)/played.length:0,playoff};
@@ -2999,7 +3042,7 @@ function strengthMeter(){
  const rows=order.map(o=>{
    const t=o.t, isMe=t===me;
    const g=gradeByMargin(pts[t],pts).grade;
-   const nm=t===me?"We are the Papal":nameOf(t);
+   const nm=t===me?"L. Murray (you)":nameOf(t);
    return `<div class="sm-row ${isMe?"me":""}">
      <span class="sm-rank">${rankOf[t]}</span>
      <span class="sm-name">${isMe?cMark(16):''}${esc(nm)}${isMe?' <span class="sm-you">you</span>':''}</span>
@@ -3321,7 +3364,7 @@ function renderPapal(){
  const c=myPosCount();
  // strength vs league
  const myPts=teamProj(seatIdx());
- const allPts=Array.from({length:8},(_,t)=>t===seatIdx()?myPts:teamProj(t)).sort((a,b)=>b-a);
+ const allPts=Array.from({length:TEAMS},(_,t)=>t===seatIdx()?myPts:teamProj(t)).sort((a,b)=>b-a);
  const myRank=allPts.filter(v=>v>myPts).length+1;
  const strength=`<div class="strength">${bearImg(44)}<div><div class="k">Papal — projected starters</div><div class="v">${myPts.toFixed(0)}<span class="u"> pts/wk</span></div></div><div style="text-align:right"><div class="k">League rank</div><div class="grade" style="color:${myRank<=2?'var(--green)':myRank<=4?'var(--gold)':'var(--txt2)'}">${myRank}<span style="font-size:16px;color:var(--mut)">/8</span></div></div></div>`;
  // needs
@@ -3406,7 +3449,7 @@ function scheduleHtml(){
 }
 function renderLeague(){
  const el=document.getElementById("pg-league");
- const teams=Array.from({length:8},(_,t)=>{
+ const teams=Array.from({length:TEAMS},(_,t)=>{
    const roster=PLAYERS.filter(p=>t===seatIdx()?S.status[p.id]==="mine":S.teamOf[p.id]===t);
    return{t,roster,pts:teamProj(t)};
  }).sort((a,b)=>b.pts-a.pts);
@@ -3429,7 +3472,7 @@ function renderReport(){
    el.innerHTML=`<div class="empty">Your draft report unlocks when the draft completes.<br><br>It'll grade your roster, rank you in the league, map your bye-week stress against your fixtures, and show the value you captured.</div>`;return;
  }
  const myPts=teamProj(seatIdx());
- const allPts=Array.from({length:8},(_,t)=>t===seatIdx()?myPts:teamProj(t)).sort((a,b)=>b-a);
+ const allPts=Array.from({length:TEAMS},(_,t)=>t===seatIdx()?myPts:teamProj(t)).sort((a,b)=>b-a);
  const myRank=allPts.filter(v=>v>myPts).length+1;
  const _allPts=Array.from({length:TEAMS},(_,t)=>teamProj(t));
  const _gm=gradeByMargin(teamProj(seatIdx()),_allPts);
@@ -3520,7 +3563,7 @@ function renderStrategy(){
   <p>When a position run starts, the tool tells you whether it's a real <b>tier-drop</b> (act) or a <b>panic</b> run (take the value everyone's ignoring). That discrimination is the sharpest live-draft edge against experienced opponents.</p>
   <h3>Fixtures & byes</h3>
   <p>Byes are judged <b>relative to the opponent you face that week</b> — two of your starters out against a full-strength rival is a hole; against a rival who's also short, it's a wash. Set your rotation in Settings to activate it, plus a Week 15–17 playoff-readiness check.</p>
-  <p class="fine">Data: FantasyPros consensus — ADP refreshed 5 Aug 2026, projections and tiers from the July merge, injuries to 10 Aug. Refresh 3–5 days pre-draft for final numbers. Engine calibrated for Full PPR · QB/2RB/2WR/TE/FLEX(W-R)/K/DST + 6 bench · 8 teams · ${ROUNDS} rounds (${TOTAL} picks). Built for the Papal. Up the Bears.</p>
+  <p class="fine">Data: FantasyPros consensus — ADP refreshed 5 Aug 2026, projections and tiers from the July merge, injuries to 10 Aug. Refresh 3–5 days pre-draft for final numbers. Engine calibrated for Full PPR · QB/2RB/2WR/TE/FLEX(W-R)/K/DST + 7 bench · 8 teams · ${ROUNDS} rounds (${TOTAL} picks). Built for the Papal. Up the Bears.</p>
   <p class="fine">Toolkit: opponent-aware VONA · Monte Carlo survival odds · 3-pick sequence planner · run detector (panic vs tier-drop) · elite-faller protection · fixture-aware bye penalties · stacks & dilution flags · Bears tiebreaker · practice mode with bots modelled on 6 years of your league (Sean strikes QB early, Stephen waits, Ryan loves a TE, Michael drafts sharp). Reset any manager to a generic bot in Settings. Tip: on iPhone, Share → <b>Add to Home Screen</b> to run it full-screen like a native app.</p>
  </div>`;
 }
@@ -3571,13 +3614,13 @@ function renderWatch(){
 }
 function renderSettings(){
  const el=document.getElementById("pg-settings");
- const seatOpts=Array.from({length:8},(_,i)=>`<option value="${i+1}" ${S.seat===i+1?"selected":""}>Pick ${i+1}</option>`).join("");
+ const seatOpts=Array.from({length:TEAMS},(_,i)=>`<option value="${i+1}" ${S.seat===i+1?"selected":""}>Pick ${i+1}</option>`).join("");
  const mgOpts=(sel)=>['<option value="">— generic bot</option>'].concat(MGRNAMES.filter(x=>x!=="Liam").map(m=>`<option ${sel===m?"selected":""}>${m}</option>`)).join("");
  const names=S.names.map((n,i)=>{
-  const opts=LEAGUE_TEAMS.filter(t=>t!=="We are the Papal")
+  const opts=LEAGUE_TEAMS.filter(t=>t!=="L. Murray")
       .map(t=>`<option value="${esc(t)}"${t===n?" selected":""}>${esc(t)}</option>`).join("");
   const inp=i===seatIdx()
-    ? `<input value="We are the Papal" disabled>`
+    ? `<input value="L. Murray" disabled>`
     : `<select class="mgsel" style="flex:1;text-align:left;font-family:inherit;font-size:12px" onchange="S.names[${i}]=this.value;S.mgrs[${i}]=TEAM_MGR[this.value]||null;save();render()"><option value="">Team ${i+1} \u2014 not set</option>${opts}</select>`;
   const sel=i===seatIdx()?`<div class="mgsel me">Liam — you</div>`:`<select class="mgsel" onchange="S.mgrs[${i}]=this.value||null;save()">${mgOpts(S.mgrs[i])}</select>`;
   return `<div class="ncell">${inp}${sel}</div>`;}).join("");
@@ -3657,7 +3700,7 @@ function recentStrip(){
    rows.push(`<div class="rp${mine?" rp-me":""}">
      <button class="rp-b" onclick="fixOpen(${k})"><span class="rp-n">#${h.pick}</span><span class="rp-t">${esc(nameOf(h.team))}</span><span class="rp-p">${esc(p.fullName)}</span><span class="rp-c">${open?"\u2715":"fix"}</span></button>
      ${newest?`<button class="rp-u" onclick="undo()" title="Undo this pick">\u21ba</button>`:""}
-     ${open?`<div class="rp-fix"><span class="rp-lbl">Actually picked by</span><div class="rp-ms">${Array.from({length:8},(_,ti)=>`<button class="rp-m${ti===h.team?" on":""}" onclick="reassign(${k},${ti})">${esc(nameOf(ti))}</button>`).join("")}</div></div>`:""}
+     ${open?`<div class="rp-fix"><span class="rp-lbl">Actually picked by</span><div class="rp-ms">${Array.from({length:TEAMS},(_,ti)=>`<button class="rp-m${ti===h.team?" on":""}" onclick="reassign(${k},${ti})">${esc(nameOf(ti))}</button>`).join("")}</div></div>`:""}
    </div>`);
  }
  return `<div class="rpwrap"><div class="rp-h">Last picks \u2014 check the owner, tap <b>fix</b> if it\u2019s wrong</div>${rows.join("")}</div>`;
